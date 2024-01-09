@@ -9,8 +9,9 @@
 
 using std::chrono::high_resolution_clock, std::chrono::duration_cast, std::chrono::duration;
 
-int main() {
-    const std::string inputFileName = "random_data.txt";
+int main(int argc, char* argv[]) {
+    const std::string inputFileName = argv[1];
+    const int numThreads = std::stoi(argv[2]);
     const std::string outputFileName = "encrypt_output.txt"; // Output text file
 
     std::ifstream inputFile(inputFileName, std::ios::binary);
@@ -49,7 +50,7 @@ int main() {
     std::vector<uint8_t> encryptedData(fileSize);
 
     // Perform encryption on each block
-    #pragma omp parallel for
+    #pragma omp parallel for num_threads(24) 
     for (std::size_t i = 0; i < fileSize / blockSize; ++i) {
         uint8_t in[blockSize];
         uint8_t out[blockSize];
@@ -75,7 +76,7 @@ int main() {
     outputFile.write(reinterpret_cast<const char*>(encryptedData.data()), fileSize);
     outputFile.close();
 
-    std::cout << "Encrypted data written to: " << outputFileName << std::endl;
+    // std::cout << "Encrypted data written to: " << outputFileName << std::endl;
 
     return 0;
 }

@@ -418,8 +418,8 @@ __global__ void aes_encrypt_kernel(const uint8_t* input, uint8_t* output, const 
     }
 }
 
-int main() {
-    const std::string inputFileName = "random_data.txt";
+int main(int argc, char* argv[]) {
+    const std::string inputFileName = argv[1];
     const std::string outputFileName = "encrypt_output.txt";
 
     std::ifstream inputFile(inputFileName, std::ios::binary);
