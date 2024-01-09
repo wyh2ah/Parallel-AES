@@ -5,7 +5,6 @@
 #include <cstdint>
 #include <iomanip>
 #include <cuda_runtime.h>
-#include <openssl/aes.h>
 #include "gmult.cuh"
 
 using std::chrono::high_resolution_clock, std::chrono::duration_cast, std::chrono::duration;
