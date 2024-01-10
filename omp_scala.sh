@@ -10,7 +10,6 @@ if [ $? -eq 0 ]; then
     # Output file for storing results
     output_result="omp_scala_results.txt"
     
-    # Initialize the output file with header
     echo "Threads Number: 1, 2, 4, 8, 16, 32, 64, 128" > ${output_result}
     echo "omp_aes Time: " >> ${output_result}
 
@@ -20,10 +19,8 @@ if [ $? -eq 0 ]; then
 
         echo "Running encryption for ${input_file} with ${thread} threads..."
         
-        # Run the omp_aes program with the current input file and thread count
         dur_time_omp=$(./omp_aes ${input_file} ${thread} | grep "AES Time:" | cut -d ' ' -f 3)
 
-        # Append results to the output file
         echo -n "${dur_time_omp}, " >> ${output_result}
 
         echo "Encryption completed for ${input_file} with ${thread} threads."

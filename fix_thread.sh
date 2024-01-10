@@ -43,7 +43,9 @@ if [ $? -eq 0 ]; then
 
         # Append results to the output file
         echo -n "${dur_time_omp}, " >> ${output_result}
-        echo "${dur_time_openssl}" >> ${output_result}
+        echo "${dur_time_openssl}, " >> ${output_result}
+        echo "${dur_time_mpi}, " >> ${output_result}
+        echo "${dur_time_cuda}" >> ${output_result}
 
         echo "Encryption completed for ${input_file}."
         echo ""
