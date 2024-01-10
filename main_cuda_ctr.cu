@@ -395,17 +395,20 @@ __device__ void aes_cipher(uint8_t *in, uint8_t *out, uint8_t *w) {
 
 
 // CUDA kernel for AES encryption
-__global__ void aes_encrypt_kernel(const uint8_t* input, uint8_t* output, const uint8_t* key, std::size_t size) {
+__global__ void aes_encrypt_kernel(uint8_t* output, const uint8_t* key, std::size_t size) {
     int idx = blockIdx.x * blockDim.x + threadIdx.x;
     const int blockSize = 16;
+
 
     for (std::size_t i = idx * blockSize; i < (idx + 1) * blockSize && i < size; ++i) {
         uint8_t in[blockSize];
         uint8_t out[blockSize];
 
         // Copy the block to be encrypted
+
+		uint64_t ctr = idx * blockSize + i;
         for (int j = 0; j < blockSize; ++j) {
-            in[j] = input[i * blockSize + j];
+            in[j] = (ctr >> (8 * j)) & 0xFF;
         }
 
         // aes_cipher(in /* in */, out /* out */, key /* expanded key */);
@@ -454,13 +457,13 @@ int main(int argc, char* argv[]) {
     
     cudaMalloc((void**)&d_input, fileSize);
     cudaMalloc((void**)&d_output, fileSize);
-    cudaMemcpy(d_input, inputData.data(), fileSize, cudaMemcpyHostToDevice);
+    // cudaMemcpy(d_input, inputData.data(), fileSize, cudaMemcpyHostToDevice);
 
 	auto begin_pin = high_resolution_clock::now();
 
-    int threadsPerBlock = 256;  // Adjust based on the characteristics of your GPU
+    int threadsPerBlock = 64;  // Adjust based on the characteristics of your GPU
     int numBlocks = (fileSize + threadsPerBlock - 1) / threadsPerBlock;
-    aes_encrypt_kernel<<<numBlocks, threadsPerBlock>>>(d_input, d_output, d_w, fileSize);
+    aes_encrypt_kernel<<<numBlocks, threadsPerBlock>>>(d_output, d_w, fileSize);
 
 	auto end_pin = high_resolution_clock::now();
     auto dur_time = duration_cast<duration<double>>(end_pin - begin_pin);
