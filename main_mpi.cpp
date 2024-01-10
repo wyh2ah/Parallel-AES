@@ -80,13 +80,16 @@ int main(int argc, char *argv[]) {
                inputData.data(), local_block_size * blockSize, MPI_BYTE,
                0, MPI_COMM_WORLD);
 
-    auto end_time = high_resolution_clock::now();
-    auto dur_time = duration_cast<duration<double>>(end_time - begin_time);
 
     if (rank == 0) {
-        std::cout << "AES Time: " << dur_time.count() << std::endl;
+        
 
         std::ofstream outputFile(outputFileName, std::ios::binary);
+
+        auto end_time = high_resolution_clock::now();
+        auto dur_time = duration_cast<duration<double>>(end_time - begin_time);
+        std::cout << "AES Time: " << dur_time.count() << std::endl;
+        
         outputFile.write(reinterpret_cast<const char*>(inputData.data()), fileSize);
         outputFile.close();
 
