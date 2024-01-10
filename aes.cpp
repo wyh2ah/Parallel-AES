@@ -42,10 +42,6 @@ void coef_add(uint8_t a[], uint8_t b[], uint8_t d[]) {
 	d[3] = a[3]^b[3];
 }
 
-/*
- * Multiplication of 4 byte words
- * m(x) = x4+1
- */
 void coef_mult(uint8_t *a, uint8_t *b, uint8_t *d) {
 
 	d[0] = gmult(a[0],b[0])^gmult(a[3],b[1])^gmult(a[2],b[2])^gmult(a[1],b[3]);
@@ -54,27 +50,13 @@ void coef_mult(uint8_t *a, uint8_t *b, uint8_t *d) {
 	d[3] = gmult(a[3],b[0])^gmult(a[2],b[1])^gmult(a[1],b[2])^gmult(a[0],b[3]);
 }
 
-/*
- * The cipher Key.	
- */
+
 int K;
 
-/*
- * Number of columns (32-bit words) comprising the State. For this 
- * standard, Nb = 4.
- */
 int Nb = 4;
 
-/*
- * Number of 32-bit words comprising the Cipher Key. For this 
- * standard, Nk = 4, 6, or 8.
- */
 int Nk;
 
-/*
- * Number of rounds, which is a function of  Nk  and  Nb (which is 
- * fixed). For this standard, Nr = 10, 12, or 14.
- */
 int Nr;
 
 /*
@@ -122,9 +104,6 @@ static uint8_t inv_s_box[256] = {
 	0x17, 0x2b, 0x04, 0x7e, 0xba, 0x77, 0xd6, 0x26, 0xe1, 0x69, 0x14, 0x63, 0x55, 0x21, 0x0c, 0x7d};// f
 
 
-/*
- * Generates the round constant Rcon[i]
- */
 uint8_t R[] = {0x02, 0x00, 0x00, 0x00};
  
 uint8_t * Rcon(uint8_t i) {
@@ -143,32 +122,21 @@ uint8_t * Rcon(uint8_t i) {
 	return R;
 }
 
-/*
- * Transformation in the Cipher and Inverse Cipher in which a Round 
- * Key is added to the State using an XOR operation. The length of a 
- * Round Key equals the size of the State (i.e., for Nb = 4, the Round 
- * Key length equals 128 bits/16 bytes).
- */
 void add_round_key(uint8_t *state, uint8_t *w, uint8_t r) {
 	
 	uint8_t c;
 	
 	for (c = 0; c < Nb; c++) {
-		state[Nb*0+c] = state[Nb*0+c]^w[4*Nb*r+4*c+0];   //debug, so it works for Nb !=4 
+		state[Nb*0+c] = state[Nb*0+c]^w[4*Nb*r+4*c+0];
 		state[Nb*1+c] = state[Nb*1+c]^w[4*Nb*r+4*c+1];
 		state[Nb*2+c] = state[Nb*2+c]^w[4*Nb*r+4*c+2];
 		state[Nb*3+c] = state[Nb*3+c]^w[4*Nb*r+4*c+3];	
 	}
 }
 
-/*
- * Transformation in the Cipher that takes all of the columns of the 
- * State and mixes their data (independently of one another) to 
- * produce new columns.
- */
 void mix_columns(uint8_t *state) {
 
-	uint8_t a[] = {0x02, 0x01, 0x01, 0x03}; // a(x) = {02} + {01}x + {01}x2 + {03}x3
+	uint8_t a[] = {0x02, 0x01, 0x01, 0x03};
 	uint8_t i, j, col[4], res[4];
 
 	for (j = 0; j < Nb; j++) {
@@ -184,13 +152,9 @@ void mix_columns(uint8_t *state) {
 	}
 }
 
-/*
- * Transformation in the Inverse Cipher that is the inverse of 
- * MixColumns().
- */
 void inv_mix_columns(uint8_t *state) {
 
-	uint8_t a[] = {0x0e, 0x09, 0x0d, 0x0b}; // a(x) = {0e} + {09}x + {0d}x2 + {0b}x3
+	uint8_t a[] = {0x0e, 0x09, 0x0d, 0x0b};
 	uint8_t i, j, col[4], res[4];
 
 	for (j = 0; j < Nb; j++) {
@@ -206,10 +170,7 @@ void inv_mix_columns(uint8_t *state) {
 	}
 }
 
-/*
- * Transformation in the Cipher that processes the State by cyclically 
- * shifting the last three rows of the State by different offsets. 
- */
+
 void shift_rows(uint8_t *state) {
 
 	uint8_t i, k, s, tmp;
@@ -231,10 +192,6 @@ void shift_rows(uint8_t *state) {
 	}
 }
 
-/*
- * Transformation in the Inverse Cipher that is the inverse of 
- * ShiftRows().
- */
 void inv_shift_rows(uint8_t *state) {
 
 	uint8_t i, k, s, tmp;
@@ -254,11 +211,6 @@ void inv_shift_rows(uint8_t *state) {
 	}
 }
 
-/*
- * Transformation in the Cipher that processes the State using a non­
- * linear byte substitution table (S-box) that operates on each of the 
- * State bytes independently. 
- */
 void sub_bytes(uint8_t *state) {
 
 	uint8_t i, j;
@@ -283,10 +235,6 @@ void sub_word(uint8_t *w) {
 	}
 }
 
-/*
- * Function used in the Key Expansion routine that takes a four-byte 
- * word and performs a cyclic permutation. 
- */
 void rot_word(uint8_t *w) {
 
 	uint8_t tmp;
@@ -301,9 +249,6 @@ void rot_word(uint8_t *w) {
 	w[3] = tmp;
 }
 
-/*
- * Key Expansion
- */
 void aes_key_expansion(uint8_t *key, uint8_t *w) {
 
 	uint8_t tmp[4];
@@ -342,10 +287,6 @@ void aes_key_expansion(uint8_t *key, uint8_t *w) {
 	}
 }
 
-
-/*
- * Initialize AES variables and allocate memory for expanded key
- */
 uint8_t *aes_init(size_t key_size) {
 
         switch (key_size) {
@@ -358,9 +299,6 @@ uint8_t *aes_init(size_t key_size) {
 	return (uint8_t*)malloc(Nb*(Nr+1)*4);
 }
 
-/*
- * Performs the AES cipher operation
- */
 void aes_cipher(uint8_t *in, uint8_t *out, uint8_t *w) {
 
 	uint8_t state[4*Nb];

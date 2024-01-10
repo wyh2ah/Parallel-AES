@@ -13,7 +13,7 @@ if [ $? -eq 0 ]; then
     # Output file for storing results
     output_result="fix_thread_results.txt"
 
-    thread=24
+    thread=2
     
     # Initialize the output file with header
     echo "File Size: 256B, 1KB, 4KB, 16KB, 64KB, 256KB, 1MB, 4MB, 16MB, 64MB, 256MB, 1GB" > ${output_result}
@@ -23,7 +23,7 @@ if [ $? -eq 0 ]; then
     echo "cuda_aes Time: " >> ${output_result}
 
     # Loop through the 12 input files
-    for i in {1..12}
+    for i in {1..3}
     do
         input_file="random_data${i}.txt"
 
@@ -32,20 +32,20 @@ if [ $? -eq 0 ]; then
         # Run the omp_aes program with the current input file
         dur_time_omp=$(./omp_aes ${input_file} ${thread} | grep "AES Time:" | cut -d ' ' -f 3)
 
-        # Run the openssl_aes program with the current input file
-        dur_time_openssl=$(./openssl_aes ${input_file} ${thread} | grep "AES Time:" | cut -d ' ' -f 3)
+        # # Run the openssl_aes program with the current input file
+        # dur_time_openssl=$(./openssl_aes ${input_file} ${thread} | grep "AES Time:" | cut -d ' ' -f 3)
 
         # Run the omp_aes program with the current input file
         dur_time_mpi=$(mpirun -np ${thread} ./mpi_aes ${input_file} | grep "AES Time:" | cut -d ' ' -f 3)
 
-        # Run the openssl_aes program with the current input file
-        dur_time_cuda=$(./cuda_aes ${input_file} | grep "AES Time:" | cut -d ' ' -f 3)
+        # # Run the openssl_aes program with the current input file
+        # dur_time_cuda=$(./cuda_aes ${input_file} | grep "AES Time:" | cut -d ' ' -f 3)
 
         # Append results to the output file
         echo -n "${dur_time_omp}, " >> ${output_result}
-        echo "${dur_time_openssl}, " >> ${output_result}
+        # echo "${dur_time_openssl}, " >> ${output_result}
         echo "${dur_time_mpi}, " >> ${output_result}
-        echo "${dur_time_cuda}" >> ${output_result}
+        # echo "${dur_time_cuda}" >> ${output_result}
 
         echo "Encryption completed for ${input_file}."
         echo ""

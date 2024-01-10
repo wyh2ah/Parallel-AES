@@ -127,15 +127,13 @@ const int Nk = 8;
 
 const int Nr = 14;
 
-/*
- * Generates the round constant Rcon[i]
- */
+
 uint8_t R[] = {0x02, 0x00, 0x00, 0x00};
  
 uint8_t * Rcon(uint8_t i) {
 	
 	if (i == 1) {
-		R[0] = 0x01; // x^(1-1) = x^0 = 1
+		R[0] = 0x01;
 	} else if (i > 1) {
 		R[0] = 0x02;
 		i--;
@@ -148,32 +146,21 @@ uint8_t * Rcon(uint8_t i) {
 	return R;
 }
 
-/*
- * Transformation in the Cipher and Inverse Cipher in which a Round 
- * Key is added to the State using an XOR operation. The length of a 
- * Round Key equals the size of the State (i.e., for Nb = 4, the Round 
- * Key length equals 128 bits/16 bytes).
- */
 __device__ void add_round_key(uint8_t *state, uint8_t *w, uint8_t r) {
 	
 	uint8_t c;
 	
 	for (c = 0; c < Nb; c++) {
-		state[Nb*0+c] = state[Nb*0+c]^w[4*Nb*r+4*c+0];   //debug, so it works for Nb !=4 
+		state[Nb*0+c] = state[Nb*0+c]^w[4*Nb*r+4*c+0];
 		state[Nb*1+c] = state[Nb*1+c]^w[4*Nb*r+4*c+1];
 		state[Nb*2+c] = state[Nb*2+c]^w[4*Nb*r+4*c+2];
 		state[Nb*3+c] = state[Nb*3+c]^w[4*Nb*r+4*c+3];	
 	}
 }
 
-/*
- * Transformation in the Cipher that takes all of the columns of the 
- * State and mixes their data (independently of one another) to 
- * produce new columns.
- */
 __device__ void mix_columns(uint8_t *state) {
 
-	uint8_t a[] = {0x02, 0x01, 0x01, 0x03}; // a(x) = {02} + {01}x + {01}x2 + {03}x3
+	uint8_t a[] = {0x02, 0x01, 0x01, 0x03};
 	uint8_t i, j, col[4], res[4];
 
 	for (j = 0; j < Nb; j++) {
@@ -230,11 +217,6 @@ __device__ void inv_shift_rows(uint8_t *state) {
 	}
 }
 
-/*
- * Transformation in the Cipher that processes the State using a non­
- * linear byte substitution table (S-box) that operates on each of the 
- * State bytes independently. 
- */
 __device__ void sub_bytes(uint8_t *state) {
 
 	uint8_t i, j;
@@ -249,12 +231,6 @@ __device__ void sub_bytes(uint8_t *state) {
 	}
 }
 
-
-/*
- * Function used in the Key Expansion routine that takes a four-byte 
- * input word and applies an S-box to each of the four bytes to 
- * produce an output word.
- */
 __device__ void sub_word(uint8_t *w) {
 
 	uint8_t i;
@@ -302,9 +278,7 @@ void rot_word_host(uint8_t *w) {
 	w[3] = tmp;
 }
 
-/*
- * Key Expansion
- */
+
 void aes_key_expansion(uint8_t *key, uint8_t *w) {
 
 	uint8_t tmp[4];
@@ -343,10 +317,6 @@ void aes_key_expansion(uint8_t *key, uint8_t *w) {
 	}
 }
 
-
-/*
- * Initialize AES variables and allocate memory for expanded key
- */
 uint8_t *aes_init(size_t key_size) {
 
     //     switch (key_size) {
@@ -359,9 +329,6 @@ uint8_t *aes_init(size_t key_size) {
 	return (uint8_t*)malloc(Nb*(Nr+1)*4);
 }
 
-/*
- * Performs the AES cipher operation
- */
 __device__ void aes_cipher(uint8_t *in, uint8_t *out, uint8_t *w) {
 
 	uint8_t state[4*Nb];
@@ -393,8 +360,6 @@ __device__ void aes_cipher(uint8_t *in, uint8_t *out, uint8_t *w) {
 	}
 }
 
-
-// CUDA kernel for AES encryption
 __global__ void aes_encrypt_kernel(uint8_t* output, const uint8_t* key, std::size_t size) {
     int idx = blockIdx.x * blockDim.x + threadIdx.x;
     const int blockSize = 16;
@@ -403,18 +368,13 @@ __global__ void aes_encrypt_kernel(uint8_t* output, const uint8_t* key, std::siz
     for (std::size_t i = idx * blockSize; i < (idx + 1) * blockSize && i < size; ++i) {
         uint8_t in[blockSize];
         uint8_t out[blockSize];
-
-        // Copy the block to be encrypted
-
 		uint64_t ctr = idx * blockSize + i;
         for (int j = 0; j < blockSize; ++j) {
             in[j] = (ctr >> (8 * j)) & 0xFF;
         }
 
-        // aes_cipher(in /* in */, out /* out */, key /* expanded key */);
         aes_cipher(in, out, const_cast<uint8_t*>(key));
 
-        // Copy the encrypted block to the output vector
         for (int j = 0; j < blockSize; ++j) {
             output[i * blockSize + j] = out[j];
         }
@@ -461,7 +421,7 @@ int main(int argc, char* argv[]) {
 
 	auto begin_pin = high_resolution_clock::now();
 
-    int threadsPerBlock = 64;  // Adjust based on the characteristics of your GPU
+    int threadsPerBlock = 64;
     int numBlocks = (fileSize + threadsPerBlock - 1) / threadsPerBlock;
     aes_encrypt_kernel<<<numBlocks, threadsPerBlock>>>(d_output, d_w, fileSize);
 

@@ -1,0 +1,8 @@
+File Size: 256B, 1KB, 4KB, 16KB, 64KB, 256KB, 1MB, 4MB, 16MB, 64MB, 256MB, 1GB
+omp_aes Time: 
+openssl_aes Time: 
+mpi_aes Time: 
+cuda_aes Time: 
+0.000543421, 8.5823e-05, 
+0.000409266, 0.000330407, 
+0.000406772, 0.000831037, 

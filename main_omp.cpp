@@ -39,33 +39,23 @@ int main(int argc, char* argv[]) {
         0x18, 0x19, 0x1a, 0x1b,
         0x1c, 0x1d, 0x1e, 0x1f};
 
-    // Set up the AES key
-
 	uint8_t * w = aes_init(sizeof(key));
 
     auto begin_pin = high_resolution_clock::now();
 
-	// use for sequential run
 	aes_key_expansion(key, w);
 
-    // Vector to store the encrypted data
     std::vector<uint8_t> encryptedData(fileSize);
 
-    // Perform encryption on each block
     #pragma omp parallel for num_threads(24) 
     for (std::size_t i = 0; i < fileSize / blockSize; ++i) {
         uint8_t in[blockSize];
         uint8_t out[blockSize];
 
-        // Copy the block to be encrypted
         std::copy(inputData.begin() + i * blockSize, inputData.begin() + (i + 1) * blockSize, in);
-
-		// uint8_t * local_w = aes_init(sizeof(key));
-		// aes_key_expansion(key, local_w);
 
         aes_cipher(in /* in */, out /* out */, w /* expanded key */);
 
-        // Copy the encrypted block to the output vector
         std::copy(out, out + blockSize, encryptedData.begin() + i * blockSize);
     }
 
@@ -73,12 +63,11 @@ int main(int argc, char* argv[]) {
     auto dur_time = duration_cast<duration<double>>(end_pin - begin_pin);
     std::cout << "AES Time: " << dur_time.count() << std::endl;
 
-    // Write the encrypted data to the output file
     std::ofstream outputFile(outputFileName, std::ios::binary);
     outputFile.write(reinterpret_cast<const char*>(encryptedData.data()), fileSize);
 	outputFile.close();
 
-    // std::cout << "Encrypted data written to: " << outputFileName << std::endl;
+    std::cout << "Encrypted data written to: " << outputFileName << std::endl;
 
     return 0;
 }
