@@ -5,9 +5,9 @@
 #include <iomanip>
 
 int main() {
-    const std::string outputFileName = "random_data12.txt";
+    const std::string outputFileName = "random_data10.txt";
     // const std::size_t dataSize = 512 * 1024 * 1024; // 1G
-    const std::size_t dataSize = 512 * 1024 * 1024;
+    const std::size_t dataSize = 32 * 1024 * 1024;
     const std::size_t seedValue = 42;
 
 

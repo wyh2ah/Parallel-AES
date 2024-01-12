@@ -3,4 +3,6 @@ omp_aes
 openssl_aes 
 mpi_aes 
 cuda_aes
+data_gen
+encrypt_output.txt
 .vscode
