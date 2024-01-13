@@ -17,7 +17,6 @@ int main(int argc, char *argv[]) {
     MPI_Comm_size(MPI_COMM_WORLD, &size);
 
     const std::string inputFileName = argv[1];
-    // const std::string inputFileName = "random_data10.txt";
     const std::string outputFileName = "encrypt_output.txt";
 
     std::ifstream inputFile(inputFileName, std::ios::binary);
@@ -49,7 +48,6 @@ int main(int argc, char *argv[]) {
 
 	aes_key_expansion(key, w);
 
-    // Broadcast the key to all processes
     MPI_Bcast(w, sizeof(w), MPI_BYTE, 0, MPI_COMM_WORLD);
 
     std::size_t blocks_per_process = fileSize / blockSize;
@@ -58,7 +56,6 @@ int main(int argc, char *argv[]) {
     std::vector<uint8_t> local_inputData(local_block_size * blockSize);
     std::vector<uint8_t> local_encryptedData(local_block_size * blockSize);
 
-    // Scatter input data to all processes
     MPI_Scatter(inputData.data(), local_block_size * blockSize, MPI_BYTE,
                 local_inputData.data(), local_block_size * blockSize, MPI_BYTE,
                 0, MPI_COMM_WORLD);

@@ -5,4 +5,6 @@ mpi_aes
 cuda_aes
 data_gen
 encrypt_output.txt
+fix_thread_results.txt
+sequential_result.txt
 .vscode

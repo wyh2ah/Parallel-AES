@@ -12,7 +12,7 @@ using std::chrono::high_resolution_clock, std::chrono::duration_cast, std::chron
 int main(int argc, char* argv[]) {
     const std::string inputFileName = argv[1];
     const int numThreads = std::stoi(argv[2]);
-    const std::string outputFileName = "encrypt_output.txt"; // Output text file
+    const std::string outputFileName = "encrypt_output.txt"; 
 
     std::ifstream inputFile(inputFileName, std::ios::binary);
 
@@ -20,15 +20,13 @@ int main(int argc, char* argv[]) {
     std::size_t fileSize = inputFile.tellg();
     inputFile.seekg(0, std::ios::beg);
 
-    // Read the entire file into memory
     std::vector<uint8_t> inputData(fileSize);
     inputFile.read(reinterpret_cast<char*>(inputData.data()), fileSize);
 
-    inputFile.close(); // Close the input file after reading
+    inputFile.close(); 
 
-    const std::size_t blockSize = 16; // 128 bits = 16 bytes
+    const std::size_t blockSize = 16;
 
-    // Read the AES key outside the loop
     uint8_t key[] = {
         0x00, 0x01, 0x02, 0x03,
         0x04, 0x05, 0x06, 0x07,

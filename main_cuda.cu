@@ -85,7 +85,7 @@ uint8_t gmult_host(uint8_t a, uint8_t b) {
 
 		hbs = a & 0x80;
 		a <<= 1;
-		if (hbs) a ^= 0x1b; // 0000 0001 0001 1011	
+		if (hbs) a ^= 0x1b;
 		b >>= 1;
 	}
 
@@ -132,7 +132,7 @@ uint8_t R[] = {0x02, 0x00, 0x00, 0x00};
 uint8_t * Rcon(uint8_t i) {
 	
 	if (i == 1) {
-		R[0] = 0x01; // x^(1-1) = x^0 = 1
+		R[0] = 0x01;
 	} else if (i > 1) {
 		R[0] = 0x02;
 		i--;
@@ -150,7 +150,7 @@ __device__ void add_round_key(uint8_t *state, uint8_t *w, uint8_t r) {
 	uint8_t c;
 	
 	for (c = 0; c < Nb; c++) {
-		state[Nb*0+c] = state[Nb*0+c]^w[4*Nb*r+4*c+0];   //debug, so it works for Nb !=4 
+		state[Nb*0+c] = state[Nb*0+c]^w[4*Nb*r+4*c+0];
 		state[Nb*1+c] = state[Nb*1+c]^w[4*Nb*r+4*c+1];
 		state[Nb*2+c] = state[Nb*2+c]^w[4*Nb*r+4*c+2];
 		state[Nb*3+c] = state[Nb*3+c]^w[4*Nb*r+4*c+3];	
@@ -180,8 +180,6 @@ __device__ void shift_rows(uint8_t *state) {
 	uint8_t i, k, s, tmp;
 
 	for (i = 1; i < 4; i++) {
-		// shift(1,4)=1; shift(2,4)=2; shift(3,4)=3
-		// shift(r, 4) = r;
 		s = 0;
 		while (s < i) {
 			tmp = state[Nb*i+0];
@@ -197,34 +195,12 @@ __device__ void shift_rows(uint8_t *state) {
 }
 
 
-__device__ void inv_shift_rows(uint8_t *state) {
-
-	uint8_t i, k, s, tmp;
-
-	for (i = 1; i < 4; i++) {
-		s = 0;
-		while (s < i) {
-			tmp = state[Nb*i+Nb-1];
-			
-			for (k = Nb-1; k > 0; k--) {
-				state[Nb*i+k] = state[Nb*i+k-1];
-			}
-
-			state[Nb*i+0] = tmp;
-			s++;
-		}
-	}
-}
-
 __device__ void sub_bytes(uint8_t *state) {
 
 	uint8_t i, j;
 	
 	for (i = 0; i < 4; i++) {
 		for (j = 0; j < Nb; j++) {
-			// s_box row: yyyy ----
-			// s_box col: ---- xxxx
-			// s_box[16*(yyyy) + xxxx] == s_box[yyyyxxxx]
 			state[Nb*i+j] = s_box_device[state[Nb*i+j]];
 		}
 	}
@@ -277,9 +253,6 @@ void rot_word_host(uint8_t *w) {
 	w[3] = tmp;
 }
 
-/*
- * Key Expansion
- */
 void aes_key_expansion(uint8_t *key, uint8_t *w) {
 
 	uint8_t tmp[4];
@@ -318,15 +291,7 @@ void aes_key_expansion(uint8_t *key, uint8_t *w) {
 	}
 }
 
-uint8_t *aes_init(size_t key_size) {
-
-    //     switch (key_size) {
-	// 	default:
-	// 	case 16: Nk = 4; Nr = 10; break;
-	// 	case 24: Nk = 6; Nr = 12; break;
-	// 	case 32: Nk = 8; Nr = 14; break;
-	// }
-
+uint8_t * aes_init(size_t key_size) {
 	return (uint8_t*)malloc(Nb*(Nr+1)*4);
 }
 

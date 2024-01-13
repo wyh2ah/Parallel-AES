@@ -1,13 +1,10 @@
 #!/bin/bash
 
-# Compile the C++ program
 g++ aes.cpp gmult.cpp main_omp.cpp -o omp_aes -std=c++17 -fopenmp -pthread -O3
 
-# Check if compilation was successful
 if [ $? -eq 0 ]; then
     echo "Compilation successful."
 
-    # Output file for storing results
     output_result="omp_scala_results.txt"
     
     echo "Threads Number: 1, 2, 4, 8, 16, 32, 64, 128" > ${output_result}

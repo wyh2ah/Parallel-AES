@@ -4,18 +4,15 @@
 #include <cstdint>
 #include <iomanip>
 
-int main() {
-    const std::string outputFileName = "random_data10.txt";
+int main(int argc, const char * argv[]) {
+    std::string outputFileName = argv[1];
+    std::size_t dataSize = atoi(argv[2]);
     // const std::size_t dataSize = 512 * 1024 * 1024; // 1G
-    const std::size_t dataSize = 32 * 1024 * 1024;
-    const std::size_t seedValue = 42;
+    // const std::size_t dataSize = 2 * 1 * 64;
+    std::size_t seedValue = 42;
 
 
     std::ofstream outputFile(outputFileName, std::ios::binary);
-    if (!outputFile.is_open()) {
-        std::cerr << "Error: Unable to open the output file." << std::endl;
-        return 1;
-    }
 
     std::mt19937 gen(seedValue);
     std::uniform_int_distribution<uint8_t> dis(0x00, 0xff);

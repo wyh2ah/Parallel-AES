@@ -198,25 +198,6 @@ __device__ void shift_rows(uint8_t *state) {
 }
 
 
-__device__ void inv_shift_rows(uint8_t *state) {
-
-	uint8_t i, k, s, tmp;
-
-	for (i = 1; i < 4; i++) {
-		s = 0;
-		while (s < i) {
-			tmp = state[Nb*i+Nb-1];
-			
-			for (k = Nb-1; k > 0; k--) {
-				state[Nb*i+k] = state[Nb*i+k-1];
-			}
-
-			state[Nb*i+0] = tmp;
-			s++;
-		}
-	}
-}
-
 __device__ void sub_bytes(uint8_t *state) {
 
 	uint8_t i, j;
@@ -317,15 +298,7 @@ void aes_key_expansion(uint8_t *key, uint8_t *w) {
 	}
 }
 
-uint8_t *aes_init(size_t key_size) {
-
-    //     switch (key_size) {
-	// 	default:
-	// 	case 16: Nk = 4; Nr = 10; break;
-	// 	case 24: Nk = 6; Nr = 12; break;
-	// 	case 32: Nk = 8; Nr = 14; break;
-	// }
-
+uint8_t * aes_init(size_t key_size) {
 	return (uint8_t*)malloc(Nb*(Nr+1)*4);
 }
 
