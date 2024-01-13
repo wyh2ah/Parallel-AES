@@ -2,12 +2,9 @@ Data Generate:
 
 ```
 # Generate specific file size
-g++ data_gen.cpp -o data_gen
-
-./data_gen $filename $filesize
+g++ data_gen.cpp -o data_gen && ./data_gen $filename $filesize
 
 # auto script
-
 ./data_gen.sh
 ```
 
@@ -46,5 +43,21 @@ nvcc gmult.cu main_cuda.cu -o cuda_aes -O3 -std=c++17
 Fix_thread Test:
 ```
 ./fix_thread.sh
+```
+
+Other Scripts:
+```
+# OpenMP scalability
+./omp_scala.sh
+
+# MPI scalability
+./mpi_scala.sh
+
+# Openssl CLI Benchmark
+./openssl_shell.sh
+
+# Serial run
+./sequential.sh
+
 ```
 
